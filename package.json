@@ -1,0 +1,9 @@
+{
+  "name": "ropatu-rage-room",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Repository-ready local rebuild foundation for Ropatu's virtual rage room",
+  "scripts": { "test": "node --test", "check": "node --check src/main.js && node --check src/game.js && npm test" },
+  "engines": { "node": ">=20" }
+}

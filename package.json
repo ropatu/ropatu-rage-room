@@ -3,7 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Repository-ready local rebuild foundation for Ropatu's virtual rage room",
-  "scripts": { "test": "node --test", "check": "node --check src/main.js && node --check src/game.js && npm test" },
-  "engines": { "node": ">=20" }
+  "description": "A playable, static-hostable 3D virtual rage room",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test",
+    "check": "node --check src/main.js && node --check src/game.js && npm test && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8"
+  }
 }

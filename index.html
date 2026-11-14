@@ -1,50 +1,22 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101116">
-  <title>Ropatu — Virtual Rage Room</title>
-  <link rel="stylesheet" href="styles.css">
-  <script type="module" src="src/main.js"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101116">
+  <meta name="description" content="A playful 3D virtual rage room. Choose a target, pick a tool, and let off steam.">
+  <title>Ropatu — Virtual Rage Room</title><link rel="stylesheet" href="styles.css"><script type="module" src="/src/main.js"></script>
 </head>
 <body>
-  <a id="skip-link" class="skip-link" href="#game">Skip to the game</a>
-  <header class="topbar">
-    <a class="brand" href="./" aria-label="Ropatu home">ROPATU<span> / VIRTUAL RAGE ROOM</span></a>
-    <button id="help-button" class="quiet-button" type="button" aria-haspopup="dialog">How to play</button>
-  </header>
-  <main>
-    <section class="room-heading" aria-labelledby="room-title">
-      <p class="eyebrow">YOUR SPACE. YOUR RULES.</p>
-      <h1 id="room-title">MIDNIGHT OFFICE</h1>
-      <p>Take a breath. Then break something.</p>
-    </section>
-    <section class="game-shell" aria-label="Rage room game">
-      <div class="hud"><span id="tool-label">TOOL: BAT</span><span id="score" aria-live="polite" aria-atomic="true">SMASHES: 0</span></div>
-      <canvas id="game" tabindex="0" role="application" aria-label="Virtual rage room game" aria-describedby="controls-help">Your browser does not support the game canvas. Use the tool and room buttons below to explore.</canvas>
-      <p id="controls-help" class="controls-help">Controls: Arrow keys aim · Space or Enter smash · 1–3 choose tool · R reset room</p>
-      <div class="toolbar" aria-label="Game controls">
-        <div class="button-group" aria-label="Choose a tool">
-          <button class="tool active" type="button" data-tool="bat">BAT <kbd>1</kbd></button>
-          <button class="tool" type="button" data-tool="crowbar">CROWBAR <kbd>2</kbd></button>
-          <button class="tool" type="button" data-tool="sledge">SLEDGE <kbd>3</kbd></button>
-        </div>
-        <button id="reset" class="quiet-button" type="button">Reset room <kbd>R</kbd></button>
-      </div>
-    </section>
-    <section class="below" aria-label="About this game">
-      <div><p class="eyebrow">BREAK THE ROOM. NOT YOUR SCREEN.</p><h2>Make a little noise.</h2></div>
-      <p>A playful, in-browser destruction game. No accounts, downloads, or real-world mess.</p>
-    </section>
-  </main>
-  <dialog id="intro" aria-labelledby="dialog-title" aria-describedby="dialog-copy">
-    <div class="dialog-card"><p class="eyebrow">WELCOME TO YOUR ROOM</p><h2 id="dialog-title">Pick your first target.</h2>
-      <p id="dialog-copy">Aim with the arrow keys or point and click. Smash with Space, Enter, or a click. Choose a tool with 1, 2, or 3.</p>
-      <button id="start" class="primary" type="button">ENTER THE ROOM</button>
-      <p class="dialog-note">You can reopen these instructions with “How to play”.</p>
-    </div>
-  </dialog>
-  <footer>Made for harmless destruction. <span>All play, no cleanup.</span></footer>
-</body>
-</html>
+<a id="skip-link" class="skip-link" href="#game">Skip to the game</a>
+<header class="topbar"><a class="brand" href="./" aria-label="Ropatu home">ROPATU<span> / VIRTUAL RAGE ROOM</span></a><button id="help-button" class="quiet-button" type="button">How to play</button></header>
+<main><section class="room-heading" aria-labelledby="room-title"><p class="eyebrow">YOUR SPACE. YOUR RULES.</p><h1 id="room-title">MIDNIGHT OFFICE</h1><p>Take a breath. Then break something.</p></section>
+<section class="game-shell" aria-label="Rage room game"><div class="hud"><span id="tool-label">TOOL: BAT</span><span id="score" aria-live="polite" aria-atomic="true">SMASHES: 0</span></div>
+<canvas id="game" tabindex="0" role="application" aria-label="Interactive 3D virtual rage room" aria-describedby="controls-help">A WebGL-capable browser is required to show the 3D room. Use the target buttons, then Smash target.</canvas>
+<p id="controls-help" class="controls-help">Select a target with its button, then smash. Arrow keys switch targets · Space or Enter smash · 1–3 choose tool · R reset.</p>
+<p id="target-label" class="target-label">Office chair</p>
+<div class="toolbar"><div class="control-stack"><span class="group-label">TARGET</span><div class="button-group" aria-label="Choose a target"><button class="tool target active" aria-pressed="true" data-target="chair" type="button">CHAIR</button><button class="tool target" aria-pressed="false" data-target="monitor" type="button">MONITOR</button><button class="tool target" aria-pressed="false" data-target="cabinet" type="button">CABINET</button></div></div>
+<div class="control-stack"><span class="group-label">TOOL</span><div class="button-group" aria-label="Choose a tool"><button class="tool active" aria-pressed="true" data-tool="bat" type="button">BAT <kbd>1</kbd></button><button class="tool" aria-pressed="false" data-tool="crowbar" type="button">CROWBAR <kbd>2</kbd></button><button class="tool" aria-pressed="false" data-tool="sledge" type="button">SLEDGE <kbd>3</kbd></button></div></div>
+<div class="action-group"><button id="smash" class="primary" type="button">SMASH <kbd>SPACE</kbd></button><button id="reset" class="quiet-button" type="button">Reset room <kbd>R</kbd></button></div></div><p id="game-status" class="sr-only" role="status" aria-live="polite"></p></section>
+<section class="below" aria-label="About this game"><div><p class="eyebrow">BREAK THE ROOM. NOT YOUR SCREEN.</p><h2>Make a little noise.</h2></div><p>A playful 3D destruction game. No accounts, downloads, or real-world mess.</p></section></main>
+<dialog id="intro" aria-labelledby="dialog-title" aria-describedby="dialog-copy"><div class="dialog-card"><p class="eyebrow">WELCOME TO YOUR ROOM</p><h2 id="dialog-title">Pick your first target.</h2><p id="dialog-copy">Select a target using its button or click it in the room. Choose a tool, then smash with Space, Enter, or the button. Arrow keys switch targets.</p><button id="start" class="primary" type="button">ENTER THE ROOM</button><p class="dialog-note">You can reopen these instructions with “How to play”.</p></div></dialog>
+<footer>Made for harmless destruction. <span>All play, no cleanup.</span></footer>
+</body></html>

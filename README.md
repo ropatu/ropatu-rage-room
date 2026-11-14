@@ -1,39 +1,40 @@
 # Ropatu: Virtual Rage Room
 
-A local, dependency-light rebuild foundation for Ropatu's browser game. The live site was inspected on 2026-11-11. No source repository was available through the connected GitHub account at that time, so this is a clean-room implementation and does not claim to reproduce the original source.
+A small, browser based 3D destruction game. The room, lighting, props, tools, and flying debris are rendered as real WebGL geometry with Three.js. It is a static site: Vite bundles the app into `dist/` for Cloudflare Pages.
 
-## Run locally
+## Run on Windows
 
-Requires Node.js 20 or newer. No runtime or development dependencies are installed.
+Requires Node.js 20 or newer and PowerShell.
 
-```sh
-npm test
-npm run check
-python3 -m http.server 8000
+```powershell
+# Open PowerShell in the project folder
+npm install
+npm run dev
 ```
 
-Open `http://localhost:8000`. Opening `index.html` directly may work in some browsers, but ES modules are best served over HTTP.
+Open the `Local` URL printed by Vite, usually `http://localhost:5173`. Keep PowerShell open while playing. Press `Ctrl+C` to stop the server. Do not open `index.html` as a file; the app uses JavaScript modules.
 
-## Current scope
+To make a production build locally:
 
-- Keyboard and pointer aiming, smash, tool selection, and reset.
-- Intro instructions presented as a modal dialog; the skip link targets the game, whose keyboard handling is disabled while the dialog is open.
-- Distinct targets, tool damage strengths, impact marks, and lightweight debris feedback.
-- Reduced-motion CSS preference, visible focus rings, and an announced smash counter.
+```powershell
+npm run build
+npm run preview
+```
 
-This is a prototype foundation. Lifelike physics, sound, room selection, cross-browser assistive technology review, and production performance work remain future steps.
+The generated `dist` folder is ready for static hosting. For Cloudflare Pages, connect the repository, set the build command to `npm run build`, and the output directory to `dist`. No server runtime or secrets are needed.
 
-## Governance
+## Play
 
-- **License:** intentionally omitted pending confirmation of copyright ownership and desired reuse terms. Do not add an open-source license by assumption.
-- **Contributions:** see [CONTRIBUTING.md](CONTRIBUTING.md).
-- **Security:** see [SECURITY.md](SECURITY.md). No dependencies are currently required.
-- Use pull requests for changes; CI runs syntax checks and unit tests. Protect the default branch and require review when a GitHub repository is created.
-- Do not commit credentials, analytics identifiers, user data, generated build output, or private server configuration.
+Choose a target button or click the 3D object. Choose a bat, crowbar, or sledge; the stronger tools remove more health per hit. Use **Smash** or press Space/Enter. Arrow keys cycle targets, 1–3 select tools, and R resets the room. The buttons remain usable on touch screens and without a keyboard.
 
-## Project structure
+The canvas has a text alternative, visible focus treatment, labelled target/tool controls, and live status updates. Reduced-motion preference disables the animated impact/debris loop. On lower-core devices, antialiasing and shadows are reduced.
 
-- `index.html`, `styles.css`: accessible page structure and presentation.
-- `src/game.js`: deterministic game state functions.
-- `src/main.js`: canvas rendering and browser interaction.
-- `tests/`: dependency-free Node test suite.
+## Development
+
+```powershell
+npm test
+npm run check
+npm run build
+```
+
+The game is an original, playful scene with no accounts, analytics, sound, or server-side data. License remains intentionally unspecified pending the copyright owner's decision.

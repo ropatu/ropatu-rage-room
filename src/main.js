@@ -1,5 +1,13 @@
 import * as THREE from 'three';
-import { TARGETS, TOOLS } from './game.js';
+import {
+  INITIAL_DRAWER_Z,
+  INITIAL_MONITOR_EMISSIVE,
+  TARGETS,
+  TOOLS,
+  applyPropDamage,
+  resetTargetProp,
+  shouldHandleGlobalSmashKey,
+} from './game.js';
 
 const canvas = document.querySelector('#game');
 const dialog = document.querySelector('#intro');
@@ -55,9 +63,18 @@ for (let z = -6; z <= 4; z += 2) box(room, [13.8, .012, .025], [0, -.018, z], ma
 const targets = new Map();
 function addTarget(id, label, position, build) {
   const group = new THREE.Group(); group.position.set(...position); group.userData.targetId = id; group.userData.label = label;
-  build(group); scene.add(group); targets.set(id, { group, label, hp: TARGETS.find(t => t.id === id).hp, maxHp: TARGETS.find(t => t.id === id).maxHp, broken: false });
+  build(group); scene.add(group);
+  const spec = TARGETS.find(t => t.id === id);
+  targets.set(id, {
+    group,
+    label,
+    hp: spec.hp,
+    maxHp: spec.maxHp,
+    broken: false,
+    baseMaterial: group.children[0]?.material ?? null,
+  });
 }
-const screen = mat('#0b1117', .25, .28), screenGlow = new THREE.MeshStandardMaterial({ color: '#173b47', emissive: '#16b7ca', emissiveIntensity: .65, roughness: .2 });
+const screen = mat('#0b1117', .25, .28), screenGlow = new THREE.MeshStandardMaterial({ color: '#173b47', emissive: '#16b7ca', emissiveIntensity: INITIAL_MONITOR_EMISSIVE, roughness: .2 });
 addTarget('monitor', 'CRT monitor', [-3.2, 0, -2.1], g => {
   box(g,[1.65,1.12,.72],[0,1.45,0],mat('#454852',.48,.3));
   box(g,[1.42,.86,.08],[0,1.48,.4],screen);
@@ -79,7 +96,7 @@ addTarget('chair', 'Office chair', [0, 0, -1], g => {
 addTarget('cabinet', 'Filing cabinet', [3.25, 0, -2], g => {
   const body=mat('#9b7845',.55,.25); box(g,[1.24,1.95,.85],[0,1.02,0],body);
   for (let y of [.45,1.03,1.61]) {
-    box(g,[1.1,.52,.035],[0,y,.45],mat('#b89458',.43,.2));
+    box(g,[1.1,.52,.035],[0,y,INITIAL_DRAWER_Z],mat('#b89458',.43,.2));
     box(g,[.22,.055,.07],[0,y+.02,.5],mat('#37383b',.32,.65));
     box(g,[.38,.025,.03],[0,y-.13,.49],mat('#d2c19a',.65));
   }
@@ -133,17 +150,11 @@ function smash() {
   const power={bat:1,crowbar:2,sledge:3}[selectedTool]; target.hp=Math.max(0,target.hp-power); smashes++; score.textContent=`SMASHES: ${smashes}`;
   const mesh=target.group.children[0];
   if(mesh?.material) {
-    const original=mesh.material; mesh.material=hitMaterial;
+    const original=target.baseMaterial ?? mesh.material; mesh.material=hitMaterial;
     setTimeout(()=>{ if(mesh.material===hitMaterial) mesh.material=original; },110);
   }
   // Damage changes the silhouette/material state of each prop as it wears down.
-  if(selected==='chair') target.group.rotation.z=Math.min(.18,(target.maxHp-target.hp)*.035);
-  if(selected==='cabinet') {
-    const drawer=target.group.children[1]; if(drawer) drawer.position.z=.45+(target.maxHp-target.hp)*.07;
-  }
-  if(selected==='monitor' && target.hp<target.maxHp) {
-    const glow=target.group.children[2]; if(glow?.material) glow.material.emissiveIntensity=Math.min(1.4,.65+(target.maxHp-target.hp)*.18);
-  }
+  applyPropDamage(selected, target);
   makeDebris(target,.6+power*.36); swingUntil=performance.now()+220;
   if(target.hp===0) { target.broken=true; target.group.visible=false; status.textContent=`${target.label} smashed to pieces. Choose another target.`; }
   else status.textContent=`${target.label} hit. ${target.hp} hits remaining.`;
@@ -151,7 +162,7 @@ function smash() {
 }
 function reset() {
   for(const d of debris){scene.remove(d.mesh);d.mesh.geometry.dispose();d.mesh.material.dispose();} debris=[];
-  for(const [id,t] of targets){t.hp=t.maxHp;t.broken=false;t.group.visible=true;t.group.rotation.set(0,0,0);}
+  for(const [id,t] of targets) resetTargetProp(id, t);
   smashes=0;score.textContent='SMASHES: 0';selectTarget('chair',false);status.textContent='Room reset. Choose a target and smash.';render(performance.now());
 }
 function render(now=performance.now()) {
@@ -183,9 +194,10 @@ start.addEventListener('click',closeHelp);
 document.querySelector('#skip-link').addEventListener('click',e=>{e.preventDefault();closeHelp();history.replaceState(null,'','#game');});
 document.addEventListener('keydown',e=>{
  if(dialog.open||e.altKey||e.ctrlKey||e.metaKey)return;
- if(['ArrowLeft','ArrowRight',' ','Enter'].includes(e.key))e.preventDefault();
- if(e.key==='ArrowLeft'||e.key==='ArrowRight'){const ids=[...targets.keys()],i=ids.indexOf(selected),step=e.key==='ArrowRight'?1:-1;selectTarget(ids[(i+step+ids.length)%ids.length]);}
- if(e.key===' '||e.key==='Enter')smash(); if(e.key.toLowerCase()==='r')reset(); if(/^[1-3]$/.test(e.key))document.querySelector(`[data-tool="${['bat','crowbar','sledge'][Number(e.key)-1]}"]`).click();
+ if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const ids=[...targets.keys()],i=ids.indexOf(selected),step=e.key==='ArrowRight'?1:-1;selectTarget(ids[(i+step+ids.length)%ids.length]);}
+ if(shouldHandleGlobalSmashKey(e)){e.preventDefault();smash();}
+ if(e.key.toLowerCase()==='r')reset();
+ if(/^[1-3]$/.test(e.key))document.querySelector(`[data-tool="${['bat','crowbar','sledge'][Number(e.key)-1]}"]`).click();
 });
 const observer=new ResizeObserver(resize);observer.observe(canvas);reducedMotion.addEventListener('change',()=>render());resize();
 requestAnimationFrame(()=>{dialog.showModal();start.focus();});
